@@ -1,0 +1,34 @@
+#pragma once
+
+// Rename this file to config.h and fill in your real values.
+// config.h is gitignored — credentials never get committed.
+
+// ---------------- WiFi ----------------
+#define WIFI_SSID       "your-wifi-ssid"
+#define WIFI_PASSWORD   "your-wifi-password"
+
+// ---------------- MQTT ----------------
+#define MQTT_HOST       "192.168.1.10"
+#define MQTT_PORT       1883
+#define MQTT_USER       "mqttuser"
+#define MQTT_PASSWORD   "mqttpass"
+
+// ---------------- OTA ----------------
+// No separate OTA hostname — ArduinoOTA uses DEVICE_ID below, same as
+// plug_light1.
+#define OTA_PASSWORD    "choose-an-ota-password"
+
+// ---------------- Device identity ----------------
+#define DEVICE_ID       "sonoff_basic_1"   // used in topics, unique_ids, WiFi + OTA hostname
+#define DEVICE_NAME     "Sonoff Basic 1"   // shown in Home Assistant
+#define MANUFACTURER    "P@cho"
+#define MODEL           "P.Switch"
+#define FW_VERSION      "1.0.0"
+
+// ---------------- Hardware pins (Sonoff Basic R1/R2) ----------------
+#define RELAY_PIN        12   // active-high
+#define STATUS_LED_PIN   13   // active-low (onboard blue LED, mirrors relay)
+#define BUTTON_PIN        0   // active-low, board has external pull-up; INPUT_PULLUP also set in firmware
+
+// ---------------- Behavior ----------------
+#define BUTTON_DEBOUNCE_MS   50
