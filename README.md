@@ -128,3 +128,11 @@ wrong pin in `config.h`, a stale-WiFi-config crash, and a JSON-schema
 light that didn't show up in HA, pay particular attention on first flash
 to: `RELAY_PIN`/`STATUS_LED_PIN`/`BUTTON_PIN` against your actual board
 wiring, and confirm the switch entity appears in HA via discovery.
+
+## Version History
+
+`FW_VERSION` lives in the gitignored `config.h`.
+
+| Version | Date | Changes |
+|---|---|---|
+| v1.0.0 | 2026-09-03 | Initial release. |
