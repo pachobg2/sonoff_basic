@@ -96,6 +96,7 @@ flashed/tested on hardware** — see the verification note below.
 | Availability / LWT | `switch/sonoff_basic_1/availability` | `online` / `offline` |
 | WiFi signal | `switch/sonoff_basic_1/wifi_signal/state` | dBm |
 | MQTT fail count | `switch/sonoff_basic_1/mqtt_fail_count/state` | integer |
+| Uptime (zeroes on any reset/power loss) | `switch/sonoff_basic_1/uptime/state` | seconds |
 | Reset reason | `switch/sonoff_basic_1/reset_reason/state` | string |
 
 Discovery configs under `homeassistant/switch/sonoff_basic_1/config` and
@@ -136,3 +137,4 @@ wiring, and confirm the switch entity appears in HA via discovery.
 | Version | Date | Changes |
 |---|---|---|
 | v1.0.0 | 2026-09-03 | Initial release. |
+| v1.0.1 | 2026-09-25 | Added an `Uptime` diagnostic sensor (seconds since boot, `device_class: duration`). ESP8266 `millis()` wraps at ~49.7 days, so elapsed time is accumulated into a 64-bit total -- zeroes on any reboot or power loss, never on its own. |

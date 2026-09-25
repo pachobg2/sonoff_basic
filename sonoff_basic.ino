@@ -56,11 +56,13 @@ String availabilityTopic  = baseTopic + "/availability";  // "online" / "offline
 String wifiSignalTopic    = baseTopic + "/wifi_signal/state";
 String resetReasonTopic   = baseTopic + "/reset_reason/state";
 String failCountTopic     = baseTopic + "/mqtt_fail_count/state";
+String uptimeTopic        = baseTopic + "/uptime/state";
 
 String discoverySwitchTopic      = String("homeassistant/switch/") + DEVICE_ID + "/config";
 String discoveryWifiSignalTopic  = String("homeassistant/sensor/") + DEVICE_ID + "/wifi_signal/config";
 String discoveryResetReasonTopic = String("homeassistant/sensor/") + DEVICE_ID + "/reset_reason/config";
 String discoveryFailCountTopic   = String("homeassistant/sensor/") + DEVICE_ID + "/mqtt_fail_count/config";
+String discoveryUptimeTopic      = String("homeassistant/sensor/") + DEVICE_ID + "/uptime/config";
 
 // ------------------------------------------------------------------
 // Globals
@@ -262,6 +264,23 @@ void publishDiscovery() {
         "}";
     checkedPublish(discoveryFailCountTopic, 1, true, payload);
   }
+
+  // Uptime (diagnostic) -- seconds since this boot; zeroes on any reset or
+  // power loss (see uptimeSeconds())
+  {
+    String payload = String("{") +
+        "\"name\":\"Uptime\"," +
+        "\"unique_id\":\"" + DEVICE_ID + "_uptime\"," +
+        "\"state_topic\":\"" + uptimeTopic + "\"," +
+        "\"unit_of_measurement\":\"s\"," +
+        "\"device_class\":\"duration\"," +
+        "\"state_class\":\"measurement\"," +
+        "\"entity_category\":\"diagnostic\"," +
+        "\"availability_topic\":\"" + availabilityTopic + "\"," +
+        "\"device\":" + deviceJson +
+        "}";
+    checkedPublish(discoveryUptimeTopic, 1, true, payload);
+  }
 }
 
 // ------------------------------------------------------------------
@@ -356,6 +375,21 @@ void connectMqtt() {
 // ------------------------------------------------------------------
 // Diagnostics
 // ------------------------------------------------------------------
+// Seconds since this boot. millis() is 32-bit and wraps back to zero at
+// ~49.7 days, which would silently zero uptime with no reset -- so elapsed
+// time is accumulated into a 64-bit total instead. Relies on being called
+// at least once per wrap period (publishDiagnostics() runs every couple of
+// minutes); zeroes only on a real reboot or power loss, since the total
+// lives in RAM.
+uint32_t uptimeSeconds() {
+  static uint32_t lastMs = 0;
+  static uint64_t totalMs = 0;
+  uint32_t now = millis();
+  totalMs += (uint32_t)(now - lastMs);
+  lastMs = now;
+  return (uint32_t)(totalMs / 1000ULL);
+}
+
 void publishDiagnostics(bool force) {
   if (!mqttClient.connected()) return;
 
@@ -371,6 +405,7 @@ void publishDiagnostics(bool force) {
   }
 
   checkedPublish(failCountTopic, 1, true, String(mqttFailCount));
+  checkedPublish(uptimeTopic, 1, true, String(uptimeSeconds()));
 }
 
 // ------------------------------------------------------------------
